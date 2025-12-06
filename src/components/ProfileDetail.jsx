@@ -39,7 +39,16 @@ function ProfileDetail({ profile, onUpdateProfile, onDeleteProfile, onClose }) {
     setNoteText("");
   };
 
-  const handleDelete = () => {
+  const handleDeleteNote = (noteId) => {
+    const updated = {
+      ...profile,
+      notes: (profile.notes || []).filter((n) => n.id !== noteId),
+      updatedAt: new Date().toISOString()
+    };
+    onUpdateProfile(updated);
+  };
+
+  const handleDeleteProfileClick = () => {
     const ok = window.confirm(
       `Are you sure you want to delete the profile for "${profile.name}"?`
     );
@@ -55,7 +64,7 @@ function ProfileDetail({ profile, onUpdateProfile, onDeleteProfile, onClose }) {
           <button type="button" className="secondary" onClick={onClose}>
             Close
           </button>
-          <button type="button" className="danger" onClick={handleDelete}>
+          <button type="button" className="danger" onClick={handleDeleteProfileClick}>
             Delete Profile
           </button>
         </div>
@@ -104,8 +113,17 @@ function ProfileDetail({ profile, onUpdateProfile, onDeleteProfile, onClose }) {
         <ul className="notes-list">
           {profile.notes.map((note) => (
             <li key={note.id} className="note-item">
-              <div className="note-meta">
-                {new Date(note.createdAt).toLocaleString()}
+              <div className="note-header">
+                <div className="note-meta">
+                  {new Date(note.createdAt).toLocaleString()}
+                </div>
+                <button
+                  type="button"
+                  className="note-delete"
+                  onClick={() => handleDeleteNote(note.id)}
+                >
+                  Delete
+                </button>
               </div>
               <div className="note-content">{note.content}</div>
             </li>

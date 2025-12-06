@@ -4,16 +4,36 @@ import "./index.css";
 import Calculator from "./components/Calculator.jsx";
 import ProfilesList from "./components/ProfileList.jsx";
 import ProfileDetail from "./components/ProfileDetail.jsx";
+import PredictionEditor from "./components/PredictionEditor.jsx";
 import { loadProfiles, saveProfiles } from "./data/storage.js";
+import {
+  loadPredictionTemplates,
+  savePredictionTemplates
+} from "./data/predictionTemplates.js";
+import {
+  loadPredictionTemplatesFromFirestore,
+  savePredictionTemplatesToFirestore
+} from "./data/predictionTemplatesRemote.js";
 
 function App() {
   const [profiles, setProfiles] = useState([]);
   const [selectedProfileId, setSelectedProfileId] = useState(null);
+  const [predictionTemplates, setPredictionTemplates] = useState(null);
 
   useEffect(() => {
-    const loaded = loadProfiles();
-    setProfiles(loaded);
+  const loaded = loadProfiles();
+  setProfiles(loaded);
+
+    async function initTemplates() {
+    const remote = await loadPredictionTemplatesFromFirestore();
+    setPredictionTemplates(remote);
+    // also keep local cache updated
+    savePredictionTemplates(remote);
+    }
+
+  initTemplates();
   }, []);
+
 
   const handleProfileSaved = (profile) => {
     setProfiles((prev) => {
@@ -48,6 +68,13 @@ function App() {
     setSelectedProfileId(null);
   };
 
+  const handleSaveTemplates = (updatedTemplates) => {
+  setPredictionTemplates(updatedTemplates);
+  savePredictionTemplates(updatedTemplates);            // local cache
+  savePredictionTemplatesToFirestore(updatedTemplates); // remote sync
+  };
+
+
   const selectedProfile =
     selectedProfileId && profiles.find((p) => p.id === selectedProfileId);
 
@@ -59,14 +86,28 @@ function App() {
       </header>
 
       <main>
-        <Calculator onProfileSaved={handleProfileSaved} />
+        {predictionTemplates && (
+          <Calculator
+            onProfileSaved={handleProfileSaved}
+            predictionTemplates={predictionTemplates}
+          />
+        )}
+
         <ProfilesList profiles={profiles} onSelectProfile={handleSelectProfile} />
+
         {selectedProfile && (
           <ProfileDetail
             profile={selectedProfile}
             onUpdateProfile={handleUpdateProfile}
             onDeleteProfile={handleDeleteProfile}
             onClose={handleCloseDetail}
+          />
+        )}
+
+        {predictionTemplates && (
+          <PredictionEditor
+            templates={predictionTemplates}
+            onSaveTemplates={handleSaveTemplates}
           />
         )}
       </main>

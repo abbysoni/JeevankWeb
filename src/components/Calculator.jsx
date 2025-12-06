@@ -1,10 +1,11 @@
 // src/components/Calculator.jsx
+// src/components/Calculator.jsx
 import { useState } from "react";
 import { calculateAllNumbers } from "../core/numerology.js";
 import { createProfile } from "../models/profile.js";
 import { generatePrediction } from "../core/predictions.js";
 
-function Calculator({ onProfileSaved }) {
+function Calculator({ onProfileSaved,  predictionTemplates  }) {
   const [name, setName] = useState("");
   const [dob, setDob] = useState("");
   const [result, setResult] = useState(null);
@@ -31,7 +32,7 @@ function Calculator({ onProfileSaved }) {
       return;
     }
 
-    const autoPrediction = generatePrediction(numbers);
+    const autoPrediction = generatePrediction(numbers, predictionTemplates);
 
     setResult({ numbers, name: trimmedName, dob });
     setPredictionText(autoPrediction);
