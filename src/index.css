@@ -122,3 +122,49 @@ button:disabled {
   font-size: 0.85rem;
   color: #6b7280;
 }
+
+.profile-item.clickable {
+  cursor: pointer;
+}
+
+.profile-item.clickable:hover {
+  background-color: #f3f4f6;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notes-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+}
+
+.note-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.note-meta {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.note-content {
+  font-size: 0.9rem;
+}
+
+.detail-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+button.danger {
+  background: #b91c1c;
+}
+
+

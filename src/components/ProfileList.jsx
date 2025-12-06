@@ -1,6 +1,6 @@
 // src/components/ProfilesList.jsx
 
-function ProfilesList({ profiles }) {
+function ProfilesList({ profiles, onSelectProfile }) {
   return (
     <section className="card">
       <h2>Saved Profiles</h2>
@@ -12,7 +12,11 @@ function ProfilesList({ profiles }) {
       ) : (
         <ul className="profiles-list">
           {profiles.map((profile) => (
-            <li key={profile.id} className="profile-item">
+            <li
+              key={profile.id}
+              className="profile-item clickable"
+              onClick={() => onSelectProfile(profile.id)}
+            >
               <div className="profile-item-title">{profile.name}</div>
               <div className="profile-item-meta">
                 DOB: {profile.dob} | Mulyank: {profile.numbers.mulyank} | Bhagyank:{" "}

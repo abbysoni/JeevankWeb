@@ -2,11 +2,13 @@
 import { useState } from "react";
 import { calculateAllNumbers } from "../core/numerology.js";
 import { createProfile } from "../models/profile.js";
+import { generatePrediction } from "../core/predictions.js";
 
 function Calculator({ onProfileSaved }) {
   const [name, setName] = useState("");
   const [dob, setDob] = useState("");
   const [result, setResult] = useState(null);
+  const [predictionText, setPredictionText] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = (e) => {
@@ -17,6 +19,7 @@ function Calculator({ onProfileSaved }) {
     if (!trimmedName || !dob) {
       setError("Please enter both name and date of birth.");
       setResult(null);
+      setPredictionText("");
       return;
     }
 
@@ -24,10 +27,14 @@ function Calculator({ onProfileSaved }) {
     if (!numbers) {
       setError("Invalid date of birth.");
       setResult(null);
+      setPredictionText("");
       return;
     }
 
+    const autoPrediction = generatePrediction(numbers);
+
     setResult({ numbers, name: trimmedName, dob });
+    setPredictionText(autoPrediction);
   };
 
   const handleSaveProfile = () => {
@@ -39,14 +46,11 @@ function Calculator({ onProfileSaved }) {
       name: profileName,
       dob: profileDob,
       numbers,
-      predictionText: ""
+      predictionText
     });
 
     onProfileSaved(profile);
     alert("Profile saved.");
-
-    // Optional: keep result, or reset
-    // setResult(null);
   };
 
   return (
@@ -100,6 +104,16 @@ function Calculator({ onProfileSaved }) {
           <p>
             <strong>Rashi:</strong> {result.numbers.rashi ?? "-"}
           </p>
+
+          <div className="form-row">
+            <label htmlFor="prediction">Prediction & Analysis (editable)</label>
+            <textarea
+              id="prediction"
+              value={predictionText}
+              onChange={(e) => setPredictionText(e.target.value)}
+              rows={6}
+            />
+          </div>
 
           <button type="button" className="secondary" onClick={handleSaveProfile}>
             Save as Profile
