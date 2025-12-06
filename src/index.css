@@ -167,4 +167,15 @@ button.danger {
   background: #b91c1c;
 }
 
+.search-row {
+  margin-bottom: 12px;
+}
+
+.search-row input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+}
+
 
