@@ -2,7 +2,7 @@
 
 const STORAGE_KEY = "jeevank_prediction_templates";
 
-const defaultPredictionTemplates = {
+export const defaultPredictionTemplates = {
   mulyank: {
     1: "Mulyank 1: Leadership, initiative, strong individuality.",
     2: "Mulyank 2: Cooperation, sensitivity, partnerships.",
@@ -44,7 +44,6 @@ export function loadPredictionTemplates() {
     if (!raw) return defaultPredictionTemplates;
 
     const parsed = JSON.parse(raw);
-    // Merge with defaults to avoid missing keys
     return {
       mulyank: {
         ...defaultPredictionTemplates.mulyank,
@@ -60,7 +59,7 @@ export function loadPredictionTemplates() {
       }
     };
   } catch (e) {
-    console.error("Failed to load prediction templates", e);
+    console.error("Failed to load prediction templates (local)", e);
     return defaultPredictionTemplates;
   }
 }
@@ -69,6 +68,6 @@ export function savePredictionTemplates(templates) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(templates));
   } catch (e) {
-    console.error("Failed to save prediction templates", e);
+    console.error("Failed to save prediction templates (local)", e);
   }
 }

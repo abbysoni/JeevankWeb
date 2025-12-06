@@ -1,6 +1,5 @@
 // src/core/predictions.js
 
-// Now generatePrediction just uses templates passed in
 export function generatePrediction(numbers, templates) {
   if (!numbers || !templates) return "";
 
