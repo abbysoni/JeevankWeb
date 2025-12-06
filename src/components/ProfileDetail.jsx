@@ -10,6 +10,8 @@ function ProfileDetail({ profile, onUpdateProfile, onDeleteProfile, onClose }) {
     setNoteText("");
   }, [profile.id]);
 
+  const core = profile.numbers?.core;
+
   const handleSavePrediction = () => {
     const updated = {
       ...profile,
@@ -78,6 +80,8 @@ function ProfileDetail({ profile, onUpdateProfile, onDeleteProfile, onClose }) {
       </p>
 
       <h3>Numbers</h3>
+      {core ? (
+        <>
       <p>
         <strong>Mulyank:</strong> {profile.numbers.mulyank}
       </p>
@@ -93,7 +97,10 @@ function ProfileDetail({ profile, onUpdateProfile, onDeleteProfile, onClose }) {
       <p>
         <strong>Rashi:</strong> {profile.numbers.rashi ?? "-"}
       </p>
-
+      </>
+         ) : (<p className="muted">No core numbers stored for this profile.</p>
+      )}
+      
       <h3>Prediction & Analysis</h3>
       <div className="form-row">
         <textarea

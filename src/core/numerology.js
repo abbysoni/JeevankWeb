@@ -130,13 +130,15 @@ export function calculateAllNumbers(name, dobString) {
   const rashi = calculateRashi(day, month);
 
   return {
-    mulyank,
-    jeevank,
-    bhagyank,
-    namank,
-    rashi,
-    rawDay: day,
-    rawMonth: month,
-    rawYear: year
+    core: {
+      mulyank,
+      jeevank,
+      bhagyank,
+      namank,
+      rashi,
+      rawDay: day,
+      rawMonth: month,
+      rawYear: year
+    }
   };
 }

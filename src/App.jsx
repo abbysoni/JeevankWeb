@@ -1,19 +1,29 @@
 // src/App.jsx
 import { useEffect, useState } from "react";
 import "./index.css";
+
 import Calculator from "./components/Calculator.jsx";
 import ProfilesList from "./components/ProfileList.jsx";
 import ProfileDetail from "./components/ProfileDetail.jsx";
 import PredictionEditor from "./components/PredictionEditor.jsx";
+
 import { loadProfiles, saveProfiles } from "./data/storage.js";
+
 import {
   loadPredictionTemplates,
   savePredictionTemplates
 } from "./data/predictionTemplates.js";
+
 import {
   loadPredictionTemplatesFromFirestore,
   savePredictionTemplatesToFirestore
 } from "./data/predictionTemplatesRemote.js";
+
+import {
+  fetchProfilesFromFirestore,
+  saveProfileToFirestore,
+  deleteProfileFromFirestore
+} from "./data/profilesRemote.js";
 
 function App() {
   const [profiles, setProfiles] = useState([]);
@@ -21,24 +31,40 @@ function App() {
   const [predictionTemplates, setPredictionTemplates] = useState(null);
 
   useEffect(() => {
-  const loaded = loadProfiles();
-  setProfiles(loaded);
+    async function init() {
+      // 1) Load profiles from Firestore
+      const remoteProfiles = await fetchProfilesFromFirestore();
 
-    async function initTemplates() {
-    const remote = await loadPredictionTemplatesFromFirestore();
-    setPredictionTemplates(remote);
-    // also keep local cache updated
-    savePredictionTemplates(remote);
+      if (remoteProfiles.length > 0) {
+        setProfiles(remoteProfiles);
+        saveProfiles(remoteProfiles); // keep local cache in sync
+      } else {
+        // Firestore empty: try localStorage as migration source
+        const local = loadProfiles();
+        setProfiles(local);
+
+        // Optional: push local profiles up to Firestore once
+        for (const p of local) {
+          // This will work best if local data already uses numbers.core;
+          // otherwise, you may want to re-create/re-save them from Calculator.
+          saveProfileToFirestore(p);
+        }
+      }
+
+      // 2) Load prediction templates from Firestore (with local fallback)
+      const templates = await loadPredictionTemplatesFromFirestore();
+      setPredictionTemplates(templates);
+      savePredictionTemplates(templates); // local cache
     }
 
-  initTemplates();
+    init();
   }, []);
-
 
   const handleProfileSaved = (profile) => {
     setProfiles((prev) => {
       const updated = [...prev, profile];
-      saveProfiles(updated);
+      saveProfiles(updated);            // local cache
+      saveProfileToFirestore(profile);  // remote
       return updated;
     });
   };
@@ -50,7 +76,8 @@ function App() {
   const handleUpdateProfile = (updatedProfile) => {
     setProfiles((prev) => {
       const updated = prev.map((p) => (p.id === updatedProfile.id ? updatedProfile : p));
-      saveProfiles(updated);
+      saveProfiles(updated);                 // local cache
+      saveProfileToFirestore(updatedProfile); // remote
       return updated;
     });
   };
@@ -58,7 +85,8 @@ function App() {
   const handleDeleteProfile = (id) => {
     setProfiles((prev) => {
       const updated = prev.filter((p) => p.id !== id);
-      saveProfiles(updated);
+      saveProfiles(updated);           // local cache
+      deleteProfileFromFirestore(id);  // remote
       return updated;
     });
     setSelectedProfileId(null);
@@ -69,11 +97,10 @@ function App() {
   };
 
   const handleSaveTemplates = (updatedTemplates) => {
-  setPredictionTemplates(updatedTemplates);
-  savePredictionTemplates(updatedTemplates);            // local cache
-  savePredictionTemplatesToFirestore(updatedTemplates); // remote sync
+    setPredictionTemplates(updatedTemplates);
+    savePredictionTemplates(updatedTemplates);             // local cache
+    savePredictionTemplatesToFirestore(updatedTemplates);  // remote
   };
-
 
   const selectedProfile =
     selectedProfileId && profiles.find((p) => p.id === selectedProfileId);

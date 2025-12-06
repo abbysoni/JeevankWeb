@@ -1,11 +1,10 @@
 // src/components/Calculator.jsx
-// src/components/Calculator.jsx
 import { useState } from "react";
 import { calculateAllNumbers } from "../core/numerology.js";
 import { createProfile } from "../models/profile.js";
 import { generatePrediction } from "../core/predictions.js";
 
-function Calculator({ onProfileSaved,  predictionTemplates  }) {
+function Calculator({ onProfileSaved, predictionTemplates }) {
   const [name, setName] = useState("");
   const [dob, setDob] = useState("");
   const [result, setResult] = useState(null);
@@ -18,21 +17,21 @@ function Calculator({ onProfileSaved,  predictionTemplates  }) {
 
     const trimmedName = name.trim();
     if (!trimmedName || !dob) {
-      setError("Please enter both name and date of birth.");
       setResult(null);
       setPredictionText("");
+      setError("Please enter both name and date of birth.");
       return;
     }
 
     const numbers = calculateAllNumbers(trimmedName, dob);
     if (!numbers) {
-      setError("Invalid date of birth.");
       setResult(null);
       setPredictionText("");
+      setError("Invalid date of birth.");
       return;
     }
 
-    const autoPrediction = generatePrediction(numbers, predictionTemplates);
+    const autoPrediction = generatePrediction(numbers.core, predictionTemplates);
 
     setResult({ numbers, name: trimmedName, dob });
     setPredictionText(autoPrediction);
@@ -53,6 +52,8 @@ function Calculator({ onProfileSaved,  predictionTemplates  }) {
     onProfileSaved(profile);
     alert("Profile saved.");
   };
+
+  const core = result?.numbers?.core;
 
   return (
     <section className="card">
@@ -87,23 +88,23 @@ function Calculator({ onProfileSaved,  predictionTemplates  }) {
 
       {error && <p className="error">{error}</p>}
 
-      {result && (
+      {core && (
         <div className="result">
           <h3>Results</h3>
           <p>
-            <strong>Mulyank:</strong> {result.numbers.mulyank}
+            <strong>Mulyank:</strong> {core.mulyank}
           </p>
           <p>
-            <strong>Jeevank:</strong> {result.numbers.jeevank}
+            <strong>Jeevank:</strong> {core.jeevank}
           </p>
           <p>
-            <strong>Bhagyank:</strong> {result.numbers.bhagyank}
+            <strong>Bhagyank:</strong> {core.bhagyank}
           </p>
           <p>
-            <strong>Namank:</strong> {result.numbers.namank ?? "-"}
+            <strong>Namank:</strong> {core.namank ?? "-"}
           </p>
           <p>
-            <strong>Rashi:</strong> {result.numbers.rashi ?? "-"}
+            <strong>Rashi:</strong> {core.rashi ?? "-"}
           </p>
 
           <div className="form-row">

@@ -12,10 +12,11 @@ function ProfilesList({ profiles, onSelectProfile }) {
       const name = (profile.name || "").toLowerCase();
       const dob = (profile.dob || "").toLowerCase();
 
+      const core = profile.numbers?.core || {};
       const nums = [
-        profile.numbers?.mulyank,
-        profile.numbers?.bhagyank,
-        profile.numbers?.jeevank
+        core.mulyank,
+        core.bhagyank,
+        core.jeevank
       ]
         .filter((n) => n !== null && n !== undefined)
         .join(" ");
@@ -51,19 +52,22 @@ function ProfilesList({ profiles, onSelectProfile }) {
         <p className="muted">No profiles match this search.</p>
       ) : (
         <ul className="profiles-list">
-          {filteredProfiles.map((profile) => (
-            <li
-              key={profile.id}
-              className="profile-item clickable"
-              onClick={() => onSelectProfile(profile.id)}
-            >
-              <div className="profile-item-title">{profile.name}</div>
-              <div className="profile-item-meta">
-                DOB: {profile.dob} | Mulyank: {profile.numbers.mulyank} | Bhagyank:{" "}
-                {profile.numbers.bhagyank}
-              </div>
-            </li>
-          ))}
+          {filteredProfiles.map((profile) => {
+            const core = profile.numbers?.core || {};
+            return (
+              <li
+                key={profile.id}
+                className="profile-item clickable"
+                onClick={() => onSelectProfile(profile.id)}
+              >
+                <div className="profile-item-title">{profile.name}</div>
+                <div className="profile-item-meta">
+                  DOB: {profile.dob} | Mulyank: {core.mulyank ?? "-"} | Bhagyank:{" "}
+                  {core.bhagyank ?? "-"}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </section>
