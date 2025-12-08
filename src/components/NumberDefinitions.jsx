@@ -5,63 +5,98 @@ function NumberDefinitions() {
     <section className="card" style={{ marginTop: "2rem" }}>
       <h2>Numerology Number Guide</h2>
       <p className="muted">
-        This section explains how each core number in JeevankWeb is calculated and what it
-        represents in Indian numerology.
+        This guide explains how the main numbers in this app are calculated and how they
+        influence personality, life path and real-life results in career, money,
+        relationships, health and spirituality.
       </p>
 
       <hr />
 
       <h3>Mulyank (Root Number)</h3>
-      <p><strong>How it is calculated:</strong> Sum of the birth day digits (DD → D + D).  
-      Reduce to a single digit unless it is 11 or 22.</p>
-      <p><strong>Meaning:</strong> Represents your inborn nature, core personality layer, natural instincts, and inner behaviour.</p>
+      <p>
+        <strong>How it is calculated:</strong> Add the digits of the birth day (DD → D + D)
+        until you get a single digit, keeping special master numbers like 11 or 22
+        separate if you work with them.
+      </p>
+      <p>
+        <strong>What it shows:</strong> Inborn nature and basic vibration of the person.
+        Shows natural behaviour, core strengths, instinctive reactions and what kind of
+        situations energise or drain the native.
+      </p>
 
       <hr />
 
       <h3>Bhagyank (Destiny Number)</h3>
-      <p><strong>How it is calculated:</strong> Sum of all digits in DOB (D+D+M+M+Y+Y+Y+Y).  
-      Reduce to a single digit unless 11 or 22.</p>
-      <p><strong>Meaning:</strong> Represents life direction, destiny, karmic journey, and overall purpose in life.</p>
+      <p>
+        <strong>How it is calculated:</strong> Add all digits of the full date of birth
+        (D + D + M + M + Y + Y + Y + Y) and reduce to a single digit (or keep 11/22 if
+        used as special numbers).
+      </p>
+      <p>
+        <strong>What it shows:</strong> Direction of life, long-term script and major
+        themes written by destiny. Indicates the type of work, responsibility and public
+        role that repeatedly appears across the years.
+      </p>
 
       <hr />
 
-      <h3>Jeevank (Life Path Number)</h3>
-      <p><strong>How it is calculated:</strong> Sum of day + month digits (D+D + M+M).  
-      Reduce to a single digit unless 11 or 22.</p>
-      <p><strong>Meaning:</strong> Represents how you walk through life—your approach, style, strengths, and lessons.</p>
+      <h3>Jeevank (Life Path Style)</h3>
+      <p>
+        <strong>How it is calculated:</strong> Add the digits of the birth day and month
+        together (D + D + M + M) and reduce to a single digit.
+      </p>
+      <p>
+        <strong>What it shows:</strong> Day-to-day way of walking through life. Shows how
+        a person approaches opportunities, challenges, relationships and decisions in
+        practical life.
+      </p>
 
       <hr />
 
       <h3>Namank (Name Number)</h3>
-      <p><strong>How it is calculated:</strong> Each letter is assigned a number based on Chaldean numerology →  
-      Sum all letters → Reduce to a single digit.</p>
-      <p><strong>Meaning:</strong> Represents the vibration your name produces.  
-      Shows how others perceive you, social identity, public behaviour, and external personality.</p>
+      <p>
+        <strong>How it is calculated:</strong> Each letter of the name is mapped to a
+        number using a numerology chart. All letter values are added and reduced to a
+        single digit.
+      </p>
+      <p>
+        <strong>What it shows:</strong> Outer image, name vibration and how the world
+        responds to the person. Often used in name corrections, signatures, brands and
+        business names to support the core numbers.
+      </p>
 
       <hr />
 
-      <h3>Rashi (Moon Sign)</h3>
-      <p><strong>How it is calculated:</strong> Based on day and month of birth (simplified method for quick reference).  
-      Note: This is not full astrological Rashi but a numerology-based classification.</p>
-      <p><strong>Meaning:</strong> Adds emotional flavour and indicates internal motivations, moods, and reactions.</p>
+      <h3>Rashi (Moon–Flavour Tag)</h3>
+      <p>
+        <strong>How it is calculated:</strong> In this app a simplified assignment is
+        made from day and month of birth to give a quick emotional tag. It is not a full
+        Vedic horoscope but a fast-moving indicator used with numbers.
+      </p>
+      <p>
+        <strong>What it shows:</strong> Emotional tone, mood patterns and how the native
+        processes feelings. Helps refine predictions when the same number combination
+        behaves differently for different people.
+      </p>
 
       <hr />
 
       <h3>Combination Analysis</h3>
-      <p><strong>What it means:</strong> This refers to patterns observed by numerologists when certain 
-      Mulyank–Bhagyank–Jeevank–Namank combinations repeat across people.</p>
       <p>
-        Examples:  
-        • Mulyank 1 + Bhagyank 8 combination → leadership with Saturn influence  
-        • Mulyank 7 + Jeevank 2 → spiritual, intuitive, emotionally sensitive  
+        <strong>What it is:</strong> Practical notes recorded by the practitioner when a
+        certain combination of Mulyank, Bhagyank, Jeevank, Namank and Rashi appears in
+        real life.
       </p>
-      <p><strong>Purpose:</strong> The “Combination Analysis” section helps you store real-life observations for these number combinations and use them for predictions.</p>
+      <p>
+        <strong>How to use it:</strong> When you see the same combination repeating in
+        different charts, you can compare events and personality traits and build your
+        own library of tested observations. Over time this becomes a powerful reference
+        for predictions, remedies and counselling.
+      </p>
 
-      <hr />
-
-      <p className="muted" style={{ fontSize: "0.9rem" }}>
-        This guide will expand automatically as Version 2 (Ātma Aṅk, Prakṛiti Aṅk) and Version 3 
-        (Personal Year, Month, Day cycles) are introduced.
+      <p className="muted" style={{ fontSize: "0.9rem", marginTop: "1rem" }}>
+        Future versions of this app will expand this guide to include additional
+        numerology tools such as soul-level numbers and yearly or monthly cycles.
       </p>
     </section>
   );

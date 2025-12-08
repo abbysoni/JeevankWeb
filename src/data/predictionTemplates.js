@@ -4,39 +4,42 @@ const STORAGE_KEY = "jeevank_prediction_templates";
 
 export const defaultPredictionTemplates = {
   mulyank: {
-    1: "Mulyank 1: Leadership, initiative, strong individuality.",
-    2: "Mulyank 2: Cooperation, sensitivity, partnerships.",
-    3: "Mulyank 3: Creativity, communication, expression.",
-    4: "Mulyank 4: Stability, discipline, practical work.",
-    5: "Mulyank 5: Change, freedom, travel, adaptability.",
-    6: "Mulyank 6: Responsibility, family, caretaking.",
-    7: "Mulyank 7: Analysis, spirituality, research, depth.",
-    8: "Mulyank 8: Power, material success, management.",
-    9: "Mulyank 9: Service, compassion, completion."
+    1: "Strong will, initiative and a natural urge to lead. Lesson: balance confidence with humility. हिंदी उद्धरण: “साहस वही है जो रास्ते बना देता है।”",
+    2: "Soft, intuitive and harmony-seeking. Learns through relationships and emotional balance. हिंदी उद्धरण: “कोमलता कमजोरी नहीं, एक शक्ति है।”",
+    3: "Expressive, creative and communicative. Needs focus to avoid scattering energy. हिंदी उद्धरण: “खुशियाँ बांटोगे तो और बढ़ेंगी।”",
+    4: "Practical, disciplined and system-loving. Builds long-term stability. हिंदी उद्धरण: “परिश्रम कभी व्यर्थ नहीं जाता।”",
+    5: "Dynamic, freedom-loving and curious. Must control impulsiveness. हिंदी उद्धरण: “परिवर्तन ही जीवन का नियम है — इसे अपनाओ।”",
+    6: "Caring, responsible and family-oriented. Must avoid over-sacrifice. हिंदी उद्धरण: “जिस हृदय में करुणा है, वही वास्तव में शक्तिशाली है।”",
+    7: "Deep, analytical and spiritual. Needs solitude and clarity. हिंदी उद्धरण: “सच्चाई की खोज ही वास्तविक शक्ति है।”",
+    8: "Ambitious, disciplined and karmic. Learns big lessons around power and responsibility. हिंदी उद्धरण: “कर्म ही आपकी असली पहचान बनाता है।”",
+    9: "Compassionate, idealistic and humanitarian. Needs to learn detachment. हिंदी उद्धरण: “जिसे त्यागना आता है, उसी के पास सबसे अधिक होता है।”"
   },
+
   bhagyank: {
-    1: "Bhagyank 1: Path of leadership and self-driven success.",
-    2: "Bhagyank 2: Path of support roles, diplomacy, and harmony.",
-    3: "Bhagyank 3: Path of teaching, arts, and public-facing roles.",
-    4: "Bhagyank 4: Path of hard work, systems, and order.",
-    5: "Bhagyank 5: Path of change, business, travel, and variety.",
-    6: "Bhagyank 6: Path of family, responsibility, and nurturing.",
-    7: "Bhagyank 7: Path of study, introspection, and inner growth.",
-    8: "Bhagyank 8: Path of authority, finance, and large responsibility.",
-    9: "Bhagyank 9: Path of service, healing, and completing karmic duties."
+    1: "Destiny pushes towards leadership and independence. हिंदी उद्धरण: “आत्मविश्वास ही सफलता की पहली सीढ़ी है।”",
+    2: "Destiny brings cooperation, partnerships and emotional lessons. हिंदी उद्धरण: “संबंध ही जीवन की असली पूँजी हैं।”",
+    3: "Destiny supports expression, teaching and upliftment. हिंदी उद्धरण: “ज्ञान बांटने से बढ़ता है।”",
+    4: "Destiny shapes a life of discipline and structured growth. हिंदी उद्धरण: “धीमी चाल भी मंज़िल तक पहुँचा देती है, बस निरंतर रहो।”",
+    5: "Destiny opens doors through change and adaptability. हिंदी उद्धरण: “नए रास्ते उन्हीं को मिलते हैं जो चलना जानते हैं।”",
+    6: "Destiny revolves around duty, nurturing and responsibility. हिंदी उद्धरण: “सेवा ही सबसे बड़ा धर्म है।”",
+    7: "Destiny demands inner growth and spiritual insight. हिंदी उद्धरण: “मन की शांति ही सबसे बड़ा धन है।”",
+    8: "Destiny brings karmic tests around power, money and authority. हिंदी उद्धरण: “भाग्य नहीं, कर्म दिशा बदलते हैं।”",
+    9: "Destiny moves toward service, completion and emotional maturity. हिंदी उद्धरण: “देने वाला ही सच्चा विजेता होता है।”"
   },
+
   jeevank: {
-    1: "Jeevank 1: Lives with directness, takes initiative in daily life.",
-    2: "Jeevank 2: Lives through cooperation and emotional exchanges.",
-    3: "Jeevank 3: Lives with optimism, social energy, and ideas.",
-    4: "Jeevank 4: Lives in a structured, planned, and disciplined way.",
-    5: "Jeevank 5: Lives dynamically with change and movement.",
-    6: "Jeevank 6: Lives around responsibility, family, and care.",
-    7: "Jeevank 7: Lives inwardly, reflective, prefers depth over speed.",
-    8: "Jeevank 8: Lives with focus on results, status, and outcomes.",
-    9: "Jeevank 9: Lives through compassion, giving, and closure."
+    1: "Walks through life with courage and decisiveness. हिंदी उद्धरण: “जो निर्णय लेता है, वही आगे बढ़ता है।”",
+    2: "Lives through cooperation and emotional exchange. हिंदी उद्धरण: “मधुरता हर दरवाज़ा खोल देती है।”",
+    3: "Moves with positivity, creativity and communication. हिंदी उद्धरण: “मुस्कान सबसे सुंदर आभूषण है।”",
+    4: "Lives in a structured and planned manner. हिंदी उद्धरण: “अनुशासन ही सफलता की कुंजी है।”",
+    5: "Lives dynamically with change and exploration. हिंदी उद्धरण: “स्वतंत्रता वही जिसे दिशा पता हो।”",
+    6: "Lives around care, duty and relationship balance. हिंदी उद्धरण: “घर वही जहाँ दिल को सुकून मिले।”",
+    7: "Lives with introspection and inner search. हिंदी उद्धरण: “अंतर में झाँको, उत्तर वहीं मिलेगा।”",
+    8: "Lives with focus on goals and achievements. हिंदी उद्धरण: “सपने वही पूरे होते हैं जिनके लिए जागा जाता है।”",
+    9: "Lives through compassion, emotion and service. हिंदी उद्धरण: “दया ही मानवता का सबसे बड़ा गुण है।”"
   }
 };
+
 
 export function loadPredictionTemplates() {
   try {
