@@ -6,8 +6,7 @@ import Calculator from "./components/Calculator.jsx";
 import ProfilesList from "./components/ProfileList.jsx";
 import ProfileDetail from "./components/ProfileDetail.jsx";
 import PredictionEditor from "./components/PredictionEditor.jsx";
-
-import { loadProfiles, saveProfiles } from "./data/storage.js";
+import NumberDefinitions from "./components/NumberDefinitions.jsx";
 
 import {
   loadPredictionTemplates,
@@ -32,29 +31,14 @@ function App() {
 
   useEffect(() => {
     async function init() {
-      // 1) Load profiles from Firestore
+      // 1) Profiles: Firestore is the single source of truth
       const remoteProfiles = await fetchProfilesFromFirestore();
+      setProfiles(remoteProfiles);
 
-      if (remoteProfiles.length > 0) {
-        setProfiles(remoteProfiles);
-        saveProfiles(remoteProfiles); // keep local cache in sync
-      } else {
-        // Firestore empty: try localStorage as migration source
-        const local = loadProfiles();
-        setProfiles(local);
-
-        // Optional: push local profiles up to Firestore once
-        for (const p of local) {
-          // This will work best if local data already uses numbers.core;
-          // otherwise, you may want to re-create/re-save them from Calculator.
-          saveProfileToFirestore(p);
-        }
-      }
-
-      // 2) Load prediction templates from Firestore (with local fallback)
+      // 2) Prediction templates: Firestore + local cache
       const templates = await loadPredictionTemplatesFromFirestore();
       setPredictionTemplates(templates);
-      savePredictionTemplates(templates); // local cache
+      savePredictionTemplates(templates);
     }
 
     init();
@@ -63,8 +47,8 @@ function App() {
   const handleProfileSaved = (profile) => {
     setProfiles((prev) => {
       const updated = [...prev, profile];
-      saveProfiles(updated);            // local cache
-      saveProfileToFirestore(profile);  // remote
+      // Firestore persistence
+      saveProfileToFirestore(profile);
       return updated;
     });
   };
@@ -76,8 +60,7 @@ function App() {
   const handleUpdateProfile = (updatedProfile) => {
     setProfiles((prev) => {
       const updated = prev.map((p) => (p.id === updatedProfile.id ? updatedProfile : p));
-      saveProfiles(updated);                 // local cache
-      saveProfileToFirestore(updatedProfile); // remote
+      saveProfileToFirestore(updatedProfile);
       return updated;
     });
   };
@@ -85,8 +68,7 @@ function App() {
   const handleDeleteProfile = (id) => {
     setProfiles((prev) => {
       const updated = prev.filter((p) => p.id !== id);
-      saveProfiles(updated);           // local cache
-      deleteProfileFromFirestore(id);  // remote
+      deleteProfileFromFirestore(id);
       return updated;
     });
     setSelectedProfileId(null);
@@ -99,7 +81,7 @@ function App() {
   const handleSaveTemplates = (updatedTemplates) => {
     setPredictionTemplates(updatedTemplates);
     savePredictionTemplates(updatedTemplates);             // local cache
-    savePredictionTemplatesToFirestore(updatedTemplates);  // remote
+    savePredictionTemplatesToFirestore(updatedTemplates);  // Firestore
   };
 
   const selectedProfile =
@@ -109,7 +91,7 @@ function App() {
     <div className="app-container">
       <header>
         <h1>JeevankWeb</h1>
-        <p>Numerology notebook for Mulyank, Bhagyank, Jeevank and saved profiles.</p>
+        <p>Numerology notebook for Mulyank, Bhagyank, Jeevank and combination analysis.</p>
       </header>
 
       <main>
@@ -137,6 +119,7 @@ function App() {
             onSaveTemplates={handleSaveTemplates}
           />
         )}
+        <NumberDefinitions/>
       </main>
     </div>
   );

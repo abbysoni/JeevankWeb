@@ -18,7 +18,6 @@ export async function fetchProfilesFromFirestore() {
     snapshot.forEach((docSnap) => {
       profiles.push(docSnap.data());
     });
-    // Optional: sort newest first
     profiles.sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
     return profiles;
   } catch (e) {

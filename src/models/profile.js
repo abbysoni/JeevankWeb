@@ -7,12 +7,11 @@ export function createProfile({ name, dob, numbers, predictionText = "" }) {
     id: crypto.randomUUID(),
     name,
     dob,
-    // numbers is expected to already be in { core: { ... } } form
-    numbers,
+    numbers, // { core: { ... } } – we already adjusted this
     predictionText,
-    notes: [],
+    combinationAnalyses: [],   // renamed from notes
     createdAt: now,
     updatedAt: now,
-    version: 1 // optional, can bump later when you add V2/V3 features
+    version: 1
   };
 }
