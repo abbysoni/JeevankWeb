@@ -3,100 +3,110 @@
 function NumberDefinitions() {
   return (
     <section className="card" style={{ marginTop: "2rem" }}>
-      <h2>Numerology Number Guide</h2>
+      <h2>Number Guide</h2>
       <p className="muted">
-        This guide explains how the main numbers in this app are calculated and how they
-        influence personality, life path and real-life results in career, money,
-        relationships, health and spirituality.
+        Quick reference for how each core number is calculated and what it signifies.
       </p>
 
       <hr />
 
+      {/* Mulyank */}
       <h3>Mulyank (Root Number)</h3>
       <p>
-        <strong>How it is calculated:</strong> Add the digits of the birth day (DD → D + D)
-        until you get a single digit, keeping special master numbers like 11 or 22
-        separate if you work with them.
+        <strong>Calculation:</strong> Day of birth → add digits (DD → D + D → 1–9).
       </p>
       <p>
-        <strong>What it shows:</strong> Inborn nature and basic vibration of the person.
-        Shows natural behaviour, core strengths, instinctive reactions and what kind of
-        situations energise or drain the native.
+        <strong>अर्थ   :</strong> मूल्यांक व्यक्ति की जन्मजात ऊर्जा और स्वभाव दिखाता है। 
+        यह बताता है कि अंदर से वह कैसा है – निर्णय कैसे लेता है, हिम्मत कितनी है, गुस्सा या 
+        धैर्य कितना है, और किस प्रकार की परिस्थितियाँ उसे मजबूत या कमजोर महसूस कराती हैं। 
+        यही संख्या जीवन के हर मोड़ पर उसके रिएक्शन और नेचर की जड़ मानी जाती है।
+      </p>
+      <p>
+        <strong>  keywords:</strong> core nature, inner vibration, natural behaviour, instinct.
       </p>
 
       <hr />
 
+      {/* Bhagyank */}
       <h3>Bhagyank (Destiny Number)</h3>
       <p>
-        <strong>How it is calculated:</strong> Add all digits of the full date of birth
-        (D + D + M + M + Y + Y + Y + Y) and reduce to a single digit (or keep 11/22 if
-        used as special numbers).
+        <strong>Calculation:</strong> Full DOB → D+D+M+M+Y+Y+Y+Y → 1–9.
       </p>
       <p>
-        <strong>What it shows:</strong> Direction of life, long-term script and major
-        themes written by destiny. Indicates the type of work, responsibility and public
-        role that repeatedly appears across the years.
+        <strong>अर्थ   :</strong> भाग्यांक जीवन की बड़ी दिशा और स्क्रिप्ट दिखाता है। 
+        यह बताता है कि किस तरह के काम, ज़िम्मेदारियाँ, मौके और चुनौतियाँ बार-बार जीवन में आती हैं। 
+        किस प्रकार की सफलता, संघर्ष या जिम्मेदारी व्यक्ति की किस्मत में लिखी है, उसका संकेत 
+        भाग्यांक से मिलता है।
+      </p>
+      <p>
+        <strong>  keywords:</strong> life script, destiny path, long-term lessons, major themes.
       </p>
 
       <hr />
 
+      {/* Jeevank */}
       <h3>Jeevank (Life Path Style)</h3>
       <p>
-        <strong>How it is calculated:</strong> Add the digits of the birth day and month
-        together (D + D + M + M) and reduce to a single digit.
+        <strong>Calculation:</strong> Day + Month → (D+D + M+M) → 1–9.
       </p>
       <p>
-        <strong>What it shows:</strong> Day-to-day way of walking through life. Shows how
-        a person approaches opportunities, challenges, relationships and decisions in
-        practical life.
+        <strong>अर्थ   :</strong> जीवनांक यह दिखाता है कि इंसान रोज़मर्रा के जीवन में कैसे चलता है। 
+        अवसर आने पर क्या वह तुरंत कूद पड़ता है या पहले बहुत सोचता है, रिश्तों को कैसे संभालता है, 
+        समस्या देखते ही भागता है या शांत दिमाग से हल खोजता है – यह सब जीवनांक के स्वभाव से जुड़ा होता है।
+      </p>
+      <p>
+        <strong>  keywords:</strong> daily approach, style of action, decision pattern, response.
       </p>
 
       <hr />
 
+      {/* Namank */}
       <h3>Namank (Name Number)</h3>
       <p>
-        <strong>How it is calculated:</strong> Each letter of the name is mapped to a
-        number using a numerology chart. All letter values are added and reduced to a
-        single digit.
+        <strong>Calculation:</strong> Name letters → convert to numbers → add → 1–9.
       </p>
       <p>
-        <strong>What it shows:</strong> Outer image, name vibration and how the world
-        responds to the person. Often used in name corrections, signatures, brands and
-        business names to support the core numbers.
+        <strong>अर्थ   :</strong> नामांक व्यक्ति के नाम की तरंग दिखाता है – दुनिया उसे कैसे देखती है, 
+        पहला इम्प्रेशन कैसा बनता है, और उसकी पब्लिक इमेज कैसी रहती है। कई बार अंदर से वह अलग होता है 
+        लेकिन नामांक की वजह से बाहर की दुनिया उसे किसी और तरह से अनुभव करती है, इसी अंतर को समझना 
+        सुधार और नाम सैटिंग में मदद करता है।
+      </p>
+      <p>
+        <strong>  keywords:</strong> name vibration, public image, first impression, social field.
       </p>
 
       <hr />
 
-      <h3>Rashi (Moon–Flavour Tag)</h3>
+      {/* Rashi */}
+      <h3>Rashi (Emotional Flavour Tag)</h3>
       <p>
-        <strong>How it is calculated:</strong> In this app a simplified assignment is
-        made from day and month of birth to give a quick emotional tag. It is not a full
-        Vedic horoscope but a fast-moving indicator used with numbers.
+        <strong>Calculation:</strong> Simplified mapping from day + month of birth.
       </p>
       <p>
-        <strong>What it shows:</strong> Emotional tone, mood patterns and how the native
-        processes feelings. Helps refine predictions when the same number combination
-        behaves differently for different people.
+        <strong>अर्थ   :</strong> यहाँ राशि को तेज़ इमोशनल टैग की तरह प्रयोग किया जाता है, 
+        जो दिखाता है कि व्यक्ति अंदर से भावनाओं को कैसे महसूस और व्यक्त करता है। वही अंक दो लोगों में 
+        अलग व्यवहार दे सकता है, क्योंकि राशि का मूड, संवेदनशीलता और प्रतिक्रिया का तरीका बदल देता है।
+      </p>
+      <p>
+        <strong>  keywords:</strong> emotional tone, mood pattern, inner reaction style.
       </p>
 
       <hr />
 
+      {/* Combination Analysis */}
       <h3>Combination Analysis</h3>
       <p>
-        <strong>What it is:</strong> Practical notes recorded by the practitioner when a
-        certain combination of Mulyank, Bhagyank, Jeevank, Namank and Rashi appears in
-        real life.
+        <strong>Calculation:</strong> Read together – Mulyank + Bhagyank + Jeevank + Namank (+ Rashi).
       </p>
       <p>
-        <strong>How to use it:</strong> When you see the same combination repeating in
-        different charts, you can compare events and personality traits and build your
-        own library of tested observations. Over time this becomes a powerful reference
-        for predictions, remedies and counselling.
+        <strong>अर्थ   :</strong> कॉम्बिनेशन एनालिसिस वह जगह है जहाँ आप अपनी खुद की 
+        ऑब्ज़र्वेशन लिखते हैं – जब एक ही अंक-संयोजन अलग-अलग लोगों की कुंडली में दिखता है, 
+        तो जीवन की घटनाएँ, रिश्तों के पैटर्न, करियर के मोड़ और मानसिक स्वभाव में क्या समानता 
+        या फर्क दिखा, उसे यहाँ नोट किया जाता है। समय के साथ यही व्यक्तिगत डेटा-बेस आपकी 
+        भविष्यवाणी और गाइडेंस को और ज़्यादा सटीक बनाता है।
       </p>
-
-      <p className="muted" style={{ fontSize: "0.9rem", marginTop: "1rem" }}>
-        Future versions of this app will expand this guide to include additional
-        numerology tools such as soul-level numbers and yearly or monthly cycles.
+      <p>
+        <strong>  keywords:</strong> pattern library, tested observations, practical prediction base.
       </p>
     </section>
   );
