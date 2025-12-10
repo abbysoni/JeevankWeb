@@ -11,6 +11,23 @@ function ProfileDetail({ profile, onUpdateProfile, onDeleteProfile, onClose }) {
   }, [profile.id]);
 
   const core = profile.numbers?.core || {};
+  const personalYear = profile.numbers?.cycles?.personalYear || null;
+
+  const [notesText, setNotesText] = useState(profile.notes || "");
+  useEffect(() => {
+  setPredictionText(profile.predictionText || "");
+  setAnalysisText("");
+  setNotesText(profile.notes || "");
+  }, [profile.id]);
+
+  const handleSaveNotes = () => {
+  const updated = {
+    ...profile,
+    notes: notesText,
+    updatedAt: new Date().toISOString()
+  };
+  onUpdateProfile(updated);
+  };
 
   // Fallback: if older profiles still use "notes", convert them
   const analyses =
@@ -120,10 +137,25 @@ function ProfileDetail({ profile, onUpdateProfile, onDeleteProfile, onClose }) {
           <p>
             <strong>Namank:</strong> {core.namank ?? "-"}
           </p>
-          <p>
+          {/* <p>
             <strong>Rashi:</strong> {core.rashi ?? "-"}
-          </p>
-        </>
+          </p> */}
+          
+      {personalYear && (
+        <>
+        <h4 style={{ marginTop: "0.5rem" }}>Personal Year snapshot</h4>
+        <p>
+          <strong>Year:</strong> {personalYear.year}
+        </p>
+        <p>
+          <strong>Personal Year No.:</strong> {personalYear.personalYear}
+        </p>
+        <p>
+          <strong>Intensity:</strong> {personalYear.label} ({personalYear.hindiLabel})
+        </p>
+          </>
+      )}
+      </>
       ) : (
         <p className="muted">No core numbers stored for this profile.</p>
       )}
@@ -175,6 +207,20 @@ function ProfileDetail({ profile, onUpdateProfile, onDeleteProfile, onClose }) {
           ))}
         </ul>
       )}
+
+      <h3>Notes</h3>
+<div className="form-row">
+  <textarea
+    value={notesText}
+    onChange={(e) => setNotesText(e.target.value)}
+    rows={3}
+    placeholder="Profile-specific notes, events, timing, or guidance."
+  />
+</div>
+<button type="button" className="secondary" onClick={handleSaveNotes}>
+  Save Notes
+</button>
+
 
       <div className="form-row">
         <label>Add Combination analysis</label>

@@ -1,85 +1,113 @@
 // src/components/PredictionEditor.jsx
-import { useState, useEffect } from "react";
-
-const CATEGORIES = [
-  { key: "mulyank", label: "Mulyank" },
-  { key: "bhagyank", label: "Bhagyank" },
-  { key: "jeevank", label: "Jeevank" }
-];
-
-const NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+import { useEffect, useState } from "react";
 
 function PredictionEditor({ templates, onSaveTemplates }) {
-  const [category, setCategory] = useState("mulyank");
-  const [number, setNumber] = useState(1);
-  const [text, setText] = useState("");
+  const [localTemplates, setLocalTemplates] = useState(templates);
+
+  const [selectedType, setSelectedType] = useState("mulyank");
+  const [selectedNumber, setSelectedNumber] = useState(1);
+  const [singleText, setSingleText] = useState("");
 
   useEffect(() => {
-    const current = templates?.[category]?.[number] || "";
-    setText(current);
-  }, [templates, category, number]);
+    setLocalTemplates(templates);
+  }, [templates]);
 
-  const handleSave = () => {
-    const updated = {
-      ...templates,
-      [category]: {
-        ...(templates[category] || {}),
-        [number]: text
-      }
-    };
-    onSaveTemplates(updated);
+  useEffect(() => {
+    const t = localTemplates?.[selectedType] || {};
+    setSingleText(t[selectedNumber] || "");
+  }, [selectedType, selectedNumber, localTemplates]);
+
+  const handleSaveSingle = () => {
+    setLocalTemplates((prev) => {
+      const updated = {
+        ...prev,
+        [selectedType]: {
+          ...(prev?.[selectedType] || {}),
+          [selectedNumber]: singleText
+        }
+      };
+      onSaveTemplates(updated);
+      return updated;
+    });
   };
 
+  const combinations = localTemplates?.combinations || {};
+
   return (
-    <section className="card">
+    <section className="card" style={{ marginTop: "1.5rem" }}>
       <h2>Prediction Templates</h2>
       <p className="muted">
-        Edit the default prediction text used for Mulyank, Bhagyank, and Jeevank.
-        These texts appear automatically in the calculator and can still be edited per profile.
+        Edit default predictions for Mulyank, Bhagyank and Jeevank. Combination analysis
+        templates are shown below for reference (edit in a later version).
       </p>
 
-      <div className="form-row horizontal">
-        <div>
-          <label>Category</label>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            {CATEGORIES.map((c) => (
-              <option key={c.key} value={c.key}>
-                {c.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label>Number</label>
-          <select
-            value={number}
-            onChange={(e) => setNumber(Number(e.target.value))}
-          >
-            {NUMBERS.map((n) => (
-              <option key={n} value={n}>
-                {n}
-              </option>
-            ))}
-          </select>
-        </div>
+      {/* Single-number templates */}
+      <div className="form-row">
+        <label>Type</label>
+        <select
+          value={selectedType}
+          onChange={(e) => setSelectedType(e.target.value)}
+        >
+          <option value="mulyank">Mulyank</option>
+          <option value="bhagyank">Bhagyank</option>
+          <option value="jeevank">Jeevank</option>
+        </select>
       </div>
 
       <div className="form-row">
-        <label>Template text for this number</label>
+        <label>Number</label>
+        <select
+          value={selectedNumber}
+          onChange={(e) => setSelectedNumber(Number(e.target.value))}
+        >
+          {Array.from({ length: 9 }).map((_, i) => (
+            <option key={i + 1} value={i + 1}>
+              {i + 1}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="form-row">
+        <label>Template text</label>
         <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          rows={6}
+          value={singleText}
+          onChange={(e) => setSingleText(e.target.value)}
+          rows={5}
         />
       </div>
 
-      <button type="button" onClick={handleSave}>
-        Save Template
+      <button type="button" onClick={handleSaveSingle}>
+        Save Number Template
       </button>
+
+      <hr style={{ margin: "1.5rem 0" }} />
+
+      {/* Combination analysis templates (read-only for now) */}
+      <h3>Combination Analysis Templates (Preview)</h3>
+      <p className="muted">
+        These templates are applied automatically when a matching Mulyank–Bhagyank–Jeevank
+        combination appears. Editing will be added in Version 2.
+      </p>
+
+      {Object.keys(combinations).length === 0 ? (
+        <p className="muted">No combination templates defined yet.</p>
+      ) : (
+        <ul className="notes-list">
+          {Object.keys(combinations).map((key) => (
+            <li key={key} className="note-item">
+              <div className="note-header">
+                <div className="note-meta">{key}</div>
+              </div>
+              <div className="note-content">
+                {combinations[key].length > 160
+                  ? combinations[key].slice(0, 160) + "..."
+                  : combinations[key]}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }

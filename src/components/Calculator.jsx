@@ -3,13 +3,28 @@ import { useState } from "react";
 import { calculateAllNumbers } from "../core/numerology.js";
 import { createProfile } from "../models/profile.js";
 import { generatePrediction } from "../core/predictions.js";
+import { calculatePersonalYearAnalysis } from "../core/personalYear.js";
+
+function getCombinationTemplate(predictionTemplates, core) {
+  if (!predictionTemplates?.combinations || !core) return null;
+  const key = `M${core.mulyank}-B${core.bhagyank}-J${core.jeevank}`;
+  return predictionTemplates.combinations[key] || null;
+}
 
 function Calculator({ onProfileSaved, predictionTemplates }) {
   const [name, setName] = useState("");
   const [dob, setDob] = useState("");
   const [result, setResult] = useState(null);
-  const [predictionText, setPredictionText] = useState("");
+
+  const [templatePrediction, setTemplatePrediction] = useState("");
+  const [combinationPrediction, setCombinationPrediction] = useState("");
+  const [personalYearResult, setPersonalYearResult] = useState(null);
+
+  const [profileNotes, setProfileNotes] = useState("");
   const [error, setError] = useState("");
+
+  const currentYear = new Date().getFullYear();
+  const [personalYearTarget, setPersonalYearTarget] = useState(String(currentYear));
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -18,23 +33,53 @@ function Calculator({ onProfileSaved, predictionTemplates }) {
     const trimmedName = name.trim();
     if (!trimmedName || !dob) {
       setResult(null);
-      setPredictionText("");
+      setTemplatePrediction("");
+      setCombinationPrediction("");
+      setPersonalYearResult(null);
+      setProfileNotes("");
       setError("Please enter both name and date of birth.");
       return;
     }
 
     const numbers = calculateAllNumbers(trimmedName, dob);
-    if (!numbers) {
+    if (!numbers || !numbers.core) {
       setResult(null);
-      setPredictionText("");
+      setTemplatePrediction("");
+      setCombinationPrediction("");
+      setPersonalYearResult(null);
+      setProfileNotes("");
       setError("Invalid date of birth.");
       return;
     }
 
-    const autoPrediction = generatePrediction(numbers.core, predictionTemplates);
+    const core = numbers.core;
 
-    setResult({ numbers, name: trimmedName, dob });
-    setPredictionText(autoPrediction);
+    // 1) Number-based prediction from templates (Mulyank + Bhagyank + Jeevank)
+    const singlePrediction = generatePrediction(core, predictionTemplates);
+    setTemplatePrediction(singlePrediction);
+
+    // 2) Personal Year analysis
+    const pyAnalysis = calculatePersonalYearAnalysis(
+      core,
+      Number(personalYearTarget) || currentYear
+    );
+    setPersonalYearResult(pyAnalysis);
+
+    // 3) Combination template (if defined)
+    const combTemplate = getCombinationTemplate(predictionTemplates, core);
+    setCombinationPrediction(combTemplate || "");
+
+    // Attach personal year into numbers.cycles to store in profile
+    const numbersWithCycles = {
+      ...numbers,
+      cycles: {
+        ...(numbers.cycles || {}),
+        personalYear: pyAnalysis || null
+      }
+    };
+
+    setResult({ numbers: numbersWithCycles, name: trimmedName, dob });
+    setProfileNotes("");
   };
 
   const handleSaveProfile = () => {
@@ -42,11 +87,29 @@ function Calculator({ onProfileSaved, predictionTemplates }) {
 
     const { name: profileName, dob: profileDob, numbers } = result;
 
+    // Create a combined prediction text that captures what was shown
+    const pieces = [];
+
+    if (templatePrediction) {
+      pieces.push("Number-based prediction:\n" + templatePrediction);
+    }
+    if (combinationPrediction) {
+      pieces.push("Combination analysis:\n" + combinationPrediction);
+    }
+    if (personalYearResult?.prediction) {
+      pieces.push(
+        `Personal Year ${personalYearResult.personalYear} (${personalYearResult.year}):\n` +
+          personalYearResult.prediction
+      );
+    }
+    const combinedPredictionText = pieces.join("\n\n");
+
     const profile = createProfile({
       name: profileName,
       dob: profileDob,
       numbers,
-      predictionText
+      predictionText: combinedPredictionText,
+      notes: profileNotes
     });
 
     onProfileSaved(profile);
@@ -83,6 +146,17 @@ function Calculator({ onProfileSaved, predictionTemplates }) {
           />
         </div>
 
+        <div className="form-row">
+          <label htmlFor="py-year">Personal Year for year</label>
+          <input
+            id="py-year"
+            type="number"
+            value={personalYearTarget}
+            onChange={(e) => setPersonalYearTarget(e.target.value)}
+            placeholder="e.g. 2025"
+          />
+        </div>
+
         <button type="submit">Calculate</button>
       </form>
 
@@ -107,13 +181,54 @@ function Calculator({ onProfileSaved, predictionTemplates }) {
             <strong>Rashi:</strong> {core.rashi ?? "-"}
           </p>
 
-          <div className="form-row">
-            <label htmlFor="prediction">Prediction & Analysis (editable)</label>
+          {/* 1) Number-based prediction */}
+          {templatePrediction && (
+            <>
+              <h4 style={{ marginTop: "0.75rem" }}>Number-based prediction</h4>
+              <p style={{ whiteSpace: "pre-line" }}>{templatePrediction}</p>
+            </>
+          )}
+
+          {/* 2) Combination analysis from templates */}
+          {combinationPrediction && (
+            <>
+              <h4 style={{ marginTop: "0.5rem" }}>Combination analysis</h4>
+              <p style={{ whiteSpace: "pre-line" }}>{combinationPrediction}</p>
+            </>
+          )}
+
+          {/* 3) Personal Year block with auto prediction (read-only) */}
+          {personalYearResult && (
+            <>
+              <h4 style={{ marginTop: "0.75rem" }}>Personal Year</h4>
+              <p>
+                <strong>Year analysed:</strong> {personalYearResult.year}
+              </p>
+              <p>
+                <strong>Personal Year No.:</strong> {personalYearResult.personalYear}
+              </p>
+              <p>
+                <strong>Intensity:</strong> {personalYearResult.label} (
+                {personalYearResult.hindiLabel})
+              </p>
+              <p className="muted">{personalYearResult.difficultyDescription}</p>
+              {personalYearResult.prediction && (
+                <p style={{ whiteSpace: "pre-line" }}>
+                  <strong>Personal Year trend:</strong> {personalYearResult.prediction}
+                </p>
+              )}
+            </>
+          )}
+
+          {/* Notes field (free-form) */}
+          <div className="form-row" style={{ marginTop: "0.75rem" }}>
+            <label htmlFor="profile-notes">Notes for this profile</label>
             <textarea
-              id="prediction"
-              value={predictionText}
-              onChange={(e) => setPredictionText(e.target.value)}
-              rows={6}
+              id="profile-notes"
+              value={profileNotes}
+              onChange={(e) => setProfileNotes(e.target.value)}
+              rows={3}
+              placeholder="Any specific information, events, remedies, or observations for this person."
             />
           </div>
 

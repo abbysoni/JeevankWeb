@@ -208,4 +208,20 @@ select {
   border: 1px solid #d1d5db;
 }
 
+.collapse-block {
+  margin-bottom: 16px;
+}
+
+.collapse-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.collapse-body h4 {
+  margin-top: 12px;
+  margin-bottom: 4px;
+}
+
+
 

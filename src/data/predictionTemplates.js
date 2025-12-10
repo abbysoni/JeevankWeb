@@ -14,7 +14,6 @@ export const defaultPredictionTemplates = {
     8: "Ambitious, disciplined and karmic. Learns big lessons around power and responsibility. हिंदी उद्धरण: “कर्म ही आपकी असली पहचान बनाता है।”",
     9: "Compassionate, idealistic and humanitarian. Needs to learn detachment. हिंदी उद्धरण: “जिसे त्यागना आता है, उसी के पास सबसे अधिक होता है।”"
   },
-
   bhagyank: {
     1: "Destiny pushes towards leadership and independence. हिंदी उद्धरण: “आत्मविश्वास ही सफलता की पहली सीढ़ी है।”",
     2: "Destiny brings cooperation, partnerships and emotional lessons. हिंदी उद्धरण: “संबंध ही जीवन की असली पूँजी हैं।”",
@@ -26,7 +25,6 @@ export const defaultPredictionTemplates = {
     8: "Destiny brings karmic tests around power, money and authority. हिंदी उद्धरण: “भाग्य नहीं, कर्म दिशा बदलते हैं।”",
     9: "Destiny moves toward service, completion and emotional maturity. हिंदी उद्धरण: “देने वाला ही सच्चा विजेता होता है।”"
   },
-
   jeevank: {
     1: "Walks through life with courage and decisiveness. हिंदी उद्धरण: “जो निर्णय लेता है, वही आगे बढ़ता है।”",
     2: "Lives through cooperation and emotional exchange. हिंदी उद्धरण: “मधुरता हर दरवाज़ा खोल देती है।”",
@@ -37,9 +35,16 @@ export const defaultPredictionTemplates = {
     7: "Lives with introspection and inner search. हिंदी उद्धरण: “अंतर में झाँको, उत्तर वहीं मिलेगा।”",
     8: "Lives with focus on goals and achievements. हिंदी उद्धरण: “सपने वही पूरे होते हैं जिनके लिए जागा जाता है।”",
     9: "Lives through compassion, emotion and service. हिंदी उद्धरण: “दया ही मानवता का सबसे बड़ा गुण है।”"
+  },
+  // Dummy combination templates for now (we'll refine in Version 2)
+  // Key format: M<mulyank>-B<bhagyank>-J<jeevank>
+  combinations: {
+    "M1-B8-J3":
+      "यह कॉम्बिनेशन leadership (1) + power/karma (8) + creative expression (3) को जोड़ता है। सही दिशा में हो तो बड़ा नाम और recognition, गलत दिशा में हो तो ego clashes और public image issues दिखा सकता है।",
+    "M2-B7-J9":
+      "यह कॉम्बिनेशन deep emotions (2) + spiritual tests (7) + intense endings (9) की तरफ संकेत देता है। relationship और mental health पर extra ध्यान ज़रूरी है, लेकिन inner awakening की huge possibility भी होती है।"
   }
 };
-
 
 export function loadPredictionTemplates() {
   try {
@@ -59,6 +64,10 @@ export function loadPredictionTemplates() {
       jeevank: {
         ...defaultPredictionTemplates.jeevank,
         ...(parsed.jeevank || {})
+      },
+      combinations: {
+        ...defaultPredictionTemplates.combinations,
+        ...(parsed.combinations || {})
       }
     };
   } catch (e) {
