@@ -4,6 +4,7 @@ import { calculateAllNumbers } from "../core/numerology.js";
 import { createProfile } from "../models/profile.js";
 import { generatePrediction } from "../core/predictions.js";
 import { calculatePersonalYearAnalysis } from "../core/personalYear.js";
+import { PALMISTRY_ANALYSIS_TEMPLATE } from "../templates/palmistryTemplate.js";
 
 function getCombinationTemplate(predictionTemplates, core) {
   if (!predictionTemplates?.combinations || !core) return null;
@@ -24,7 +25,9 @@ function Calculator({ onProfileSaved, predictionTemplates }) {
   const [error, setError] = useState("");
 
   const currentYear = new Date().getFullYear();
-  const [personalYearTarget, setPersonalYearTarget] = useState(String(currentYear));
+  const [personalYearTarget, setPersonalYearTarget] = useState(
+    String(currentYear)
+  );
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -74,8 +77,8 @@ function Calculator({ onProfileSaved, predictionTemplates }) {
       ...numbers,
       cycles: {
         ...(numbers.cycles || {}),
-        personalYear: pyAnalysis || null
-      }
+        personalYear: pyAnalysis || null,
+      },
     };
 
     setResult({ numbers: numbersWithCycles, name: trimmedName, dob });
@@ -109,7 +112,7 @@ function Calculator({ onProfileSaved, predictionTemplates }) {
       dob: profileDob,
       numbers,
       predictionText: combinedPredictionText,
-      notes: profileNotes
+      notes: profileNotes,
     });
 
     onProfileSaved(profile);
@@ -205,16 +208,20 @@ function Calculator({ onProfileSaved, predictionTemplates }) {
                 <strong>Year analysed:</strong> {personalYearResult.year}
               </p>
               <p>
-                <strong>Personal Year No.:</strong> {personalYearResult.personalYear}
+                <strong>Personal Year No.:</strong>{" "}
+                {personalYearResult.personalYear}
               </p>
               <p>
                 <strong>Intensity:</strong> {personalYearResult.label} (
                 {personalYearResult.hindiLabel})
               </p>
-              <p className="muted">{personalYearResult.difficultyDescription}</p>
+              <p className="muted">
+                {personalYearResult.difficultyDescription}
+              </p>
               {personalYearResult.prediction && (
                 <p style={{ whiteSpace: "pre-line" }}>
-                  <strong>Personal Year trend:</strong> {personalYearResult.prediction}
+                  <strong>Personal Year trend:</strong>{" "}
+                  {personalYearResult.prediction}
                 </p>
               )}
             </>
@@ -232,8 +239,25 @@ function Calculator({ onProfileSaved, predictionTemplates }) {
             />
           </div>
 
-          <button type="button" className="secondary" onClick={handleSaveProfile}>
+          <button
+            type="button"
+            className="secondary"
+            onClick={handleSaveProfile}
+          >
             Save as Profile
+          </button>
+
+          <button
+            type="button"
+            className="secondary"
+            onClick={() =>
+              setProfileNotes(
+                (prev) =>
+                  (prev ? prev + "\n\n" : "") + PALMISTRY_ANALYSIS_TEMPLATE
+              )
+            }
+          >
+            Insert Palmistry Template
           </button>
         </div>
       )}

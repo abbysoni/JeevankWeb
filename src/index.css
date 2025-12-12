@@ -222,6 +222,15 @@ select {
   margin-top: 12px;
   margin-bottom: 4px;
 }
+.collapse-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.collapse-body {
+  margin-top: 8px;
+}
 
 
 

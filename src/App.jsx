@@ -7,6 +7,8 @@ import ProfilesList from "./components/ProfileList.jsx";
 import ProfileDetail from "./components/ProfileDetail.jsx";
 import PredictionEditor from "./components/PredictionEditor.jsx";
 import NumberDefinitions from "./components/NumberDefinitions.jsx";
+import PalmistryReport from "./components/PalmistryReport.jsx";
+
 
 import {
   loadPredictionTemplates,
@@ -119,7 +121,9 @@ function App() {
             onSaveTemplates={handleSaveTemplates}
           />
         )}
-        <NumberDefinitions/>
+        <NumberDefinitions />
+        <PalmistryReport />
+
       </main>
     </div>
   );

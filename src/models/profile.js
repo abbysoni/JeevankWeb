@@ -12,10 +12,17 @@ export function createProfile({ name, dob, numbers, predictionText = "", notes =
     id,
     name,
     dob,
-    numbers,          // { core: {...}, cycles?: { personalYear? } }
-    predictionText,   // auto-generated combined prediction (numbers + personal year, etc.)
-    notes,            // free-form profile notes from calculator
-    combinationAnalyses: [],   // your existing per-profile combination notes (if already used)
+    numbers,
+    predictionText,
+    notes,
+
+    // NEW: "Want to know more?" expandable data
+    more: {
+      palmImages: [], // array of { id, dataUrl, addedAt }
+      palmNotes: ""   // long text
+    },
+
+    combinationAnalyses: [],
     createdAt: now,
     updatedAt: now,
     version: 1
