@@ -4,7 +4,6 @@ import { calculateAllNumbers } from "../core/numerology.js";
 import { createProfile } from "../models/profile.js";
 import { generatePrediction } from "../core/predictions.js";
 import { calculatePersonalYearAnalysis } from "../core/personalYear.js";
-import { PALMISTRY_ANALYSIS_TEMPLATE } from "../templates/palmistryTemplate.js";
 
 function getCombinationTemplate(predictionTemplates, core) {
   if (!predictionTemplates?.combinations || !core) return null;
@@ -85,7 +84,7 @@ function Calculator({ onProfileSaved, predictionTemplates }) {
     setProfileNotes("");
   };
 
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
     if (!result) return;
 
     const { name: profileName, dob: profileDob, numbers } = result;
@@ -115,8 +114,14 @@ function Calculator({ onProfileSaved, predictionTemplates }) {
       notes: profileNotes,
     });
 
-    onProfileSaved(profile);
-    alert("Profile saved.");
+    const res = await onProfileSaved(profile);
+
+if (res?.ok) {
+  alert("Profile saved to Firestore.");
+} else {
+  alert("Failed to save profile to Firestore. Check console for details.");
+}
+
   };
 
   const core = result?.numbers?.core;
@@ -247,18 +252,7 @@ function Calculator({ onProfileSaved, predictionTemplates }) {
             Save as Profile
           </button>
 
-          <button
-            type="button"
-            className="secondary"
-            onClick={() =>
-              setProfileNotes(
-                (prev) =>
-                  (prev ? prev + "\n\n" : "") + PALMISTRY_ANALYSIS_TEMPLATE
-              )
-            }
-          >
-            Insert Palmistry Template
-          </button>
+          
         </div>
       )}
     </section>

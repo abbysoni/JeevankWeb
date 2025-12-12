@@ -1,395 +1,225 @@
-// src/components/ProfileDetail.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { uploadPalmImage } from "../firebase/storage.js";
-import { PALMISTRY_ANALYSIS_TEMPLATE } from "../templates/palmistryTemplate.js";
 
-function ProfileDetail({ profile, onUpdateProfile, onDeleteProfile, onClose }) {
-  const [predictionText, setPredictionText] = useState(
-    profile.predictionText || ""
-  );
-  const [analysisText, setAnalysisText] = useState("");
-  // const [showMore, setShowMore] = useState(false);
+function ProfileDetail({ profile, onUpdateProfile }) {
+  // ----------------------------
+  // 1) Null-safe reads (critical)
+  // ----------------------------
+  const safeProfile = profile || {};
+  const safeId = safeProfile.id || "";
+  const safeName = safeProfile.name || "(No name)";
+  const safeDob = safeProfile.dob || "-";
+
+  const safeNumbers = safeProfile.numbers || {};
+  const safeCore = safeNumbers.core || {};
+  const safeCycles = safeNumbers.cycles || {};
+  const safePersonalYear = safeCycles.personalYear || null;
+
+  const safePredictionText = safeProfile.predictionText || ""; // if you store combined predictions
+  const safeNotesFromDb = safeProfile.notes || "";
+
+  const safePalm = safeProfile.palm || {};
+  const safePalmNotesFromDb = safePalm.notes || "";
+  const safePalmImagesFromDb = Array.isArray(safePalm.images) ? safePalm.images : [];
+
+  // ----------------------------
+  // 2) Local editable state
+  // ----------------------------
+  const [notes, setNotes] = useState("");
   const [showPalm, setShowPalm] = useState(false);
-  const [palmNotes, setPalmNotes] = useState(profile.more?.palmNotes || "");
-  const [palmImages, setPalmImages] = useState(profile.more?.palmImages || []);
-  const [uploadingPalm, setUploadingPalm] = useState(false);
 
-  useEffect(() => {
-    setPredictionText(profile.predictionText || "");
-    setAnalysisText("");
-  }, [profile.id]);
+  const [palmNotes, setPalmNotes] = useState("");
+  const [palmImages, setPalmImages] = useState([]);
 
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  // ----------------------------
+  // 3) Hydrate state on profile change
+  // ----------------------------
   useEffect(() => {
+    setNotes(safeNotesFromDb);
+    setPalmNotes(safePalmNotesFromDb);
+    setPalmImages(safePalmImagesFromDb);
     setShowPalm(false);
-    setPalmNotes(profile.more?.palmNotes || "");
-    setPalmImages(profile.more?.palmImages || []);
-  }, [profile.id]);
+  }, [safeId]); // only when switching profiles
 
-  const core = profile.numbers?.core || {};
-  const personalYear = profile.numbers?.cycles?.personalYear || null;
-
-  const [notesText, setNotesText] = useState(profile.notes || "");
-  useEffect(() => {
-    setPredictionText(profile.predictionText || "");
-    setAnalysisText("");
-    setNotesText(profile.notes || "");
-  }, [profile.id]);
-
-  const handleSaveNotes = () => {
-    const updated = {
-      ...profile,
-      notes: notesText,
-      updatedAt: new Date().toISOString(),
-    };
-    onUpdateProfile(updated);
-  };
-
-  // Fallback: if older profiles still use "notes", convert them
-  const analyses =
-    profile.combinationAnalyses && Array.isArray(profile.combinationAnalyses)
-      ? profile.combinationAnalyses
-      : profile.notes && Array.isArray(profile.notes)
-      ? profile.notes
-      : [];
-
-  const handleSavePrediction = () => {
-    const updated = {
-      ...profile,
-      predictionText,
-      updatedAt: new Date().toISOString(),
-    };
-    onUpdateProfile(updated);
-  };
-
-  const handleAddAnalysis = () => {
-    const trimmed = analysisText.trim();
-    if (!trimmed) return;
-
-    const newAnalysis = {
-      id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
-      content: trimmed,
-      combination: {
-        mulyank: core.mulyank ?? null,
-        bhagyank: core.bhagyank ?? null,
-        jeevank: core.jeevank ?? null,
-        namank: core.namank ?? null,
-        rashi: core.rashi ?? null,
-      },
-    };
-
-    const updatedAnalyses = [...analyses, newAnalysis];
-
-    const updated = {
-      ...profile,
-      combinationAnalyses: updatedAnalyses,
-      updatedAt: new Date().toISOString(),
-    };
-
-    // Optional: keep old "notes" in sync for backwards compatibility
-    // updated.notes = updatedAnalyses;
-
-    onUpdateProfile(updated);
-    setAnalysisText("");
-  };
-
-  const handlePalmUpload = async (e) => {
-    const files = Array.from(e.target.files || []);
-    if (!files.length) return;
-
-    setUploadingPalm(true);
+  // ----------------------------
+  // 4) Helper: persist updates
+  // ----------------------------
+  const persistProfile = async (updates) => {
+    setSaving(true);
     try {
-      const now = new Date().toISOString();
-      const uploaded = [];
-
-      for (const file of files) {
-        const imageId =
-          (crypto.randomUUID && crypto.randomUUID()) ||
-          "img-" + Date.now() + "-" + Math.random().toString(16).slice(2);
-
-        const url = await uploadPalmImage({
-          profileId: profile.id,
-          file,
-          imageId,
-        });
-
-        uploaded.push({ id: imageId, url, createdAt: now });
-      }
-
-      const updatedImages = [...palmImages, ...uploaded];
-      setPalmImages(updatedImages);
-
-      const updatedProfile = {
-        ...profile,
-        more: {
-          ...(profile.more || {}),
-          palmImages: updatedImages,
-          palmNotes,
-        },
-        updatedAt: new Date().toISOString(),
+      const merged = {
+        ...safeProfile,
+        ...updates,
+        // keep schema stable
+        numbers: updates?.numbers ?? safeProfile.numbers ?? {},
+        notes: updates?.notes ?? notes,
+        palm: updates?.palm ?? { images: palmImages, notes: palmNotes }
       };
-
-      onUpdateProfile(updatedProfile);
-      e.target.value = "";
-    } catch (err) {
-      console.error(err);
-      alert("Palm photo upload failed.");
+      await onUpdateProfile(merged);
     } finally {
-      setUploadingPalm(false);
+      setSaving(false);
     }
   };
 
-  const handleDeleteAnalysis = (analysisId) => {
-    const updatedAnalyses = analyses.filter((a) => a.id !== analysisId);
-
-    const updated = {
-      ...profile,
-      combinationAnalyses: updatedAnalyses,
-      updatedAt: new Date().toISOString(),
-    };
-
-    // Optional: keep old "notes" in sync
-    // updated.notes = updatedAnalyses;
-
-    onUpdateProfile(updated);
+  const handleSaveNotes = async () => {
+    await persistProfile({ notes });
   };
 
-  const handleDeleteProfileClick = () => {
-    const ok = window.confirm(
-      `Are you sure you want to delete the profile for "${profile.name}"?`
-    );
-    if (!ok) return;
-    onDeleteProfile(profile.id);
-  };
-
-  const readFileAsDataUrl = (file) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+  const handleSavePalmNotes = async () => {
+    await persistProfile({
+      palm: {
+        images: palmImages,
+        notes: palmNotes
+      }
     });
+  };
 
-  const handleAddPalmImages = async (e) => {
-    const files = Array.from(e.target.files || []);
-    if (!files.length) return;
+  // ----------------------------
+  // 5) Palm uploads (Storage -> URL -> Firestore)
+  // ----------------------------
+  const handlePalmUpload = async (fileList) => {
+    const files = Array.from(fileList || []);
+    if (!files.length || !safeId) return;
 
     setUploading(true);
-
     try {
-      const now = new Date().toISOString();
       const uploaded = [];
 
       for (const file of files) {
-        const imageId =
-          (crypto.randomUUID && crypto.randomUUID()) ||
+        const id =
+          (typeof crypto !== "undefined" && crypto.randomUUID && crypto.randomUUID()) ||
           "img-" + Date.now() + "-" + Math.random().toString(16).slice(2);
 
         const url = await uploadPalmImage({
-          profileId: profile.id,
+          profileId: safeId,
           file,
-          imageId,
+          imageId: id
         });
 
-        uploaded.push({
-          id: imageId,
-          url,
-          createdAt: now,
-        });
+        uploaded.push({ id, url });
       }
 
-      const updatedImages = [...palmImages, ...uploaded];
-      setPalmImages(updatedImages);
+      const nextImages = [...palmImages, ...uploaded];
+      setPalmImages(nextImages);
 
-      const updatedProfile = {
-        ...profile,
-        more: {
-          palmImages: updatedImages,
-          palmNotes,
-        },
-        updatedAt: new Date().toISOString(),
-      };
-
-      onUpdateProfile(updatedProfile);
-      e.target.value = "";
+      // Persist immediately so it is available across devices
+      await persistProfile({
+        palm: {
+          images: nextImages,
+          notes: palmNotes
+        }
+      });
     } catch (err) {
-      console.error(err);
-      alert("Failed to upload palm image.");
+      console.error("Palm upload failed:", err);
+      alert("Palm photo upload failed. Check console for details.");
     } finally {
       setUploading(false);
     }
   };
 
-  const handleRemovePalmImage = (id) => {
-    const updatedImages = palmImages.filter((x) => x.id !== id);
-    setPalmImages(updatedImages);
-
-    const updatedProfile = {
-      ...profile,
-      more: {
-        ...(profile.more || {}),
-        palmImages: updatedImages,
-        palmNotes,
-      },
-      updatedAt: new Date().toISOString(),
-    };
-    onUpdateProfile(updatedProfile);
+  const handleRemovePalmImage = async (imageId) => {
+    const nextImages = palmImages.filter((x) => x.id !== imageId);
+    setPalmImages(nextImages);
+    await persistProfile({
+      palm: { images: nextImages, notes: palmNotes }
+    });
   };
 
-  const handleSavePalmNotes = () => {
-    const updatedProfile = {
-      ...profile,
-      more: {
-        ...(profile.more || {}),
-        palmImages,
-        palmNotes,
-      },
-      updatedAt: new Date().toISOString(),
-    };
-    onUpdateProfile(updatedProfile);
-    alert("Palm notes saved.");
-  };
+  // ----------------------------
+  // 6) Render helpers
+  // ----------------------------
+  const hasCoreNumbers =
+    safeCore && (safeCore.mulyank || safeCore.bhagyank || safeCore.jeevank);
 
   return (
-    <section className="card">
-      <div className="detail-header">
-        <h2>Profile Detail</h2>
-        <div className="detail-actions">
-          <button type="button" className="secondary" onClick={onClose}>
-            Close
-          </button>
-          <button
-            type="button"
-            className="danger"
-            onClick={handleDeleteProfileClick}
-          >
-            Delete Profile
-          </button>
-        </div>
-      </div>
-
-      <p>
-        <strong>Name:</strong> {profile.name}
-      </p>
-      <p>
-        <strong>DOB:</strong> {profile.dob}
+    <section className="card" style={{ marginTop: "1rem" }}>
+      <h2 style={{ marginBottom: "0.25rem" }}>{safeName}</h2>
+      <p className="muted" style={{ marginTop: 0 }}>
+        DOB: {safeDob}
       </p>
 
+      {/* ----------------------------
+          Numbers (saved data)
+         ---------------------------- */}
       <h3>Numbers</h3>
-      {core ? (
+      {hasCoreNumbers ? (
         <>
           <p>
-            <strong>Mulyank:</strong> {core.mulyank}
+            <strong>Mulyank:</strong> {safeCore.mulyank ?? "-"}
           </p>
           <p>
-            <strong>Jeevank:</strong> {core.jeevank}
+            <strong>Bhagyank:</strong> {safeCore.bhagyank ?? "-"}
           </p>
           <p>
-            <strong>Bhagyank:</strong> {core.bhagyank}
+            <strong>Jeevank:</strong> {safeCore.jeevank ?? "-"}
           </p>
           <p>
-            <strong>Namank:</strong> {core.namank ?? "-"}
+            <strong>Namank:</strong> {safeCore.namank ?? "-"}
           </p>
-          {/* <p>
-            <strong>Rashi:</strong> {core.rashi ?? "-"}
-          </p> */}
+          <p>
+            <strong>Rashi:</strong> {safeCore.rashi ?? "-"}
+          </p>
 
-          {personalYear && (
+          {safePersonalYear && (
             <>
-              <h4 style={{ marginTop: "0.5rem" }}>Personal Year snapshot</h4>
+              <h4 style={{ marginTop: "0.75rem" }}>Personal Year (Saved)</h4>
               <p>
-                <strong>Year:</strong> {personalYear.year}
+                <strong>Year:</strong> {safePersonalYear.year ?? "-"}
               </p>
               <p>
-                <strong>Personal Year No.:</strong> {personalYear.personalYear}
+                <strong>Personal Year No.:</strong>{" "}
+                {safePersonalYear.personalYear ?? "-"}
               </p>
               <p>
-                <strong>Intensity:</strong> {personalYear.label} (
-                {personalYear.hindiLabel})
+                <strong>Intensity:</strong>{" "}
+                {safePersonalYear.label
+                  ? `${safePersonalYear.label} (${safePersonalYear.hindiLabel || ""})`
+                  : "-"}
               </p>
+              {safePersonalYear.prediction && (
+                <p style={{ whiteSpace: "pre-line" }}>
+                  <strong>Trend:</strong> {safePersonalYear.prediction}
+                </p>
+              )}
             </>
           )}
         </>
       ) : (
-        <p className="muted">No core numbers stored for this profile.</p>
+        <p className="muted">No numbers saved for this profile.</p>
       )}
 
-      <h3>Prediction & Analysis</h3>
-      <div className="form-row">
-        <textarea
-          value={predictionText}
-          onChange={(e) => setPredictionText(e.target.value)}
-          rows={6}
-        />
-      </div>
-      <button type="button" onClick={handleSavePrediction}>
-        Save Prediction
-      </button>
-
-      <h3>Combination analysis</h3>
-      {analyses.length === 0 ? (
-        <p className="muted">
-          No combination analysis yet. Add insights about how these numbers play
-          out.
-        </p>
+      {/* ----------------------------
+          Predictions (saved data)
+         ---------------------------- */}
+      <h3 style={{ marginTop: "1rem" }}>Predictions</h3>
+      {safePredictionText ? (
+        <p style={{ whiteSpace: "pre-line" }}>{safePredictionText}</p>
       ) : (
-        <ul className="notes-list">
-          {analyses.map((analysis) => (
-            <li key={analysis.id} className="note-item">
-              <div className="note-header">
-                <div className="note-meta">
-                  {new Date(analysis.createdAt).toLocaleString()}
-                  {analysis.combination && (
-                    <>
-                      {" "}
-                      | Comb: M{analysis.combination.mulyank ?? "-"}
-                      {" / "}B{analysis.combination.bhagyank ?? "-"}
-                      {" / "}J{analysis.combination.jeevank ?? "-"}
-                      {" / "}N{analysis.combination.namank ?? "-"}
-                    </>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  className="note-delete"
-                  onClick={() => handleDeleteAnalysis(analysis.id)}
-                >
-                  Delete
-                </button>
-              </div>
-              <div className="note-content">{analysis.content}</div>
-            </li>
-          ))}
-        </ul>
+        <p className="muted">No saved predictions for this profile.</p>
       )}
 
-      <h3>Notes</h3>
-      <div className="form-row">
-        <textarea
-          value={notesText}
-          onChange={(e) => setNotesText(e.target.value)}
-          rows={3}
-          placeholder="Profile-specific notes, events, timing, or guidance."
-        />
-      </div>
-      <button type="button" className="secondary" onClick={handleSaveNotes}>
-        Save Notes
+      {/* ----------------------------
+          Notes (editable)
+         ---------------------------- */}
+      <h3 style={{ marginTop: "1rem" }}>Notes</h3>
+      <textarea
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+        rows={3}
+        placeholder="Profile notes..."
+      />
+      <button type="button" className="secondary" disabled={saving} onClick={handleSaveNotes}>
+        {saving ? "Saving..." : "Save Notes"}
       </button>
 
-      <div className="form-row">
-        <label>Add Combination analysis</label>
-        <textarea
-          value={analysisText}
-          onChange={(e) => setAnalysisText(e.target.value)}
-          rows={3}
-          placeholder="Describe how this combination behaves, events, outcomes, patterns..."
-        />
-      </div>
-      <button type="button" className="secondary" onClick={handleAddAnalysis}>
-        Add Combination analysis
-      </button>
       <hr style={{ margin: "1.25rem 0" }} />
 
+      {/* ----------------------------
+          Palm analysis (collapsible)
+         ---------------------------- */}
       <div className="collapse-block">
         <div className="collapse-header">
           <h3 style={{ margin: 0 }}>Palm Analysis</h3>
@@ -409,18 +239,18 @@ function ProfileDetail({ profile, onUpdateProfile, onDeleteProfile, onClose }) {
               type="file"
               accept="image/*"
               multiple
-              disabled={uploadingPalm}
-              onChange={handlePalmUpload}
+              disabled={uploading}
+              onChange={(e) => handlePalmUpload(e.target.files)}
             />
-            {uploadingPalm && <p className="muted">Uploading…</p>}
+            {uploading && <p className="muted">Uploading…</p>}
 
-            {palmImages.length > 0 && (
+            {palmImages.length > 0 ? (
               <div
                 style={{
                   marginTop: "0.75rem",
                   display: "grid",
                   gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
-                  gap: "10px",
+                  gap: "10px"
                 }}
               >
                 {palmImages.map((img) => (
@@ -432,7 +262,7 @@ function ProfileDetail({ profile, onUpdateProfile, onDeleteProfile, onClose }) {
                         width: "100%",
                         height: "140px",
                         objectFit: "cover",
-                        borderRadius: "8px",
+                        borderRadius: "8px"
                       }}
                     />
                     <button
@@ -446,36 +276,29 @@ function ProfileDetail({ profile, onUpdateProfile, onDeleteProfile, onClose }) {
                   </div>
                 ))}
               </div>
+            ) : (
+              <p className="muted" style={{ marginTop: "0.5rem" }}>
+                No palm photos uploaded yet.
+              </p>
             )}
 
             <hr style={{ margin: "1rem 0" }} />
 
-            <div className="collapse-header" style={{ gap: "10px" }}>
-              <h4 style={{ margin: 0 }}>Palmistry Notes</h4>
-              <button
-                type="button"
-                className="secondary"
-                onClick={handleAnalyzePalm}
-              >
-                Analyze
-              </button>
-            </div>
-
+            <h4>Palm Notes</h4>
             <textarea
               value={palmNotes}
               onChange={(e) => setPalmNotes(e.target.value)}
-              rows={8}
-              placeholder="Palmistry notes will appear here..."
-              style={{ marginTop: "8px" }}
+              rows={6}
+              placeholder="Palmistry notes..."
             />
-
             <button
               type="button"
               className="secondary"
-              style={{ marginTop: "8px" }}
+              disabled={saving}
               onClick={handleSavePalmNotes}
+              style={{ marginTop: "8px" }}
             >
-              Save Palm Notes
+              {saving ? "Saving..." : "Save Palm Notes"}
             </button>
           </div>
         )}

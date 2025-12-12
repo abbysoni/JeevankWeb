@@ -1,131 +1,81 @@
-// src/App.jsx
 import { useEffect, useState } from "react";
-import "./index.css";
 
 import Calculator from "./components/Calculator.jsx";
-import ProfilesList from "./components/ProfileList.jsx";
+import ProfilesList from "./components/ProfilesList.jsx";
 import ProfileDetail from "./components/ProfileDetail.jsx";
 import PredictionEditor from "./components/PredictionEditor.jsx";
 import NumberDefinitions from "./components/NumberDefinitions.jsx";
 import PalmistryReport from "./components/PalmistryReport.jsx";
 
-
-import {
-  loadPredictionTemplates,
-  savePredictionTemplates
-} from "./data/predictionTemplates.js";
-
-import {
-  loadPredictionTemplatesFromFirestore,
-  savePredictionTemplatesToFirestore
-} from "./data/predictionTemplatesRemote.js";
-
-import {
-  fetchProfilesFromFirestore,
-  saveProfileToFirestore,
-  deleteProfileFromFirestore
-} from "./data/profilesRemote.js";
+import { fetchProfilesFirestore, createProfileFirestore, updateProfileFirestore, deleteProfileFirestore } from "./firebase/profilesApi.js";
+import { loadPredictionTemplates } from "./data/predictionTemplates.js";
 
 function App() {
   const [profiles, setProfiles] = useState([]);
-  const [selectedProfileId, setSelectedProfileId] = useState(null);
-  const [predictionTemplates, setPredictionTemplates] = useState(null);
+  const [activeProfile, setActiveProfile] = useState(null);
+
+  const [predictionTemplates, setPredictionTemplates] = useState(loadPredictionTemplates());
+  const [loadingProfiles, setLoadingProfiles] = useState(true);
 
   useEffect(() => {
-    async function init() {
-      // 1) Profiles: Firestore is the single source of truth
-      const remoteProfiles = await fetchProfilesFromFirestore();
-      setProfiles(remoteProfiles);
-
-      // 2) Prediction templates: Firestore + local cache
-      const templates = await loadPredictionTemplatesFromFirestore();
-      setPredictionTemplates(templates);
-      savePredictionTemplates(templates);
-    }
-
-    init();
+    (async () => {
+      try {
+        const data = await fetchProfilesFirestore();
+        setProfiles(data);
+      } finally {
+        setLoadingProfiles(false);
+      }
+    })();
   }, []);
 
-  const handleProfileSaved = (profile) => {
-    setProfiles((prev) => {
-      const updated = [...prev, profile];
-      // Firestore persistence
-      saveProfileToFirestore(profile);
-      return updated;
-    });
+  const handleSaveProfile = async (profile) => {
+    const saved = await createProfileFirestore(profile);
+    setProfiles((p) => [...p, saved]);
+    return saved;
   };
 
-  const handleSelectProfile = (id) => {
-    setSelectedProfileId(id);
+  const handleUpdateProfile = async (profile) => {
+    await updateProfileFirestore(profile.id, profile);
+    setProfiles((p) => p.map((x) => (x.id === profile.id ? profile : x)));
+    setActiveProfile(profile);
   };
 
-  const handleUpdateProfile = (updatedProfile) => {
-    setProfiles((prev) => {
-      const updated = prev.map((p) => (p.id === updatedProfile.id ? updatedProfile : p));
-      saveProfileToFirestore(updatedProfile);
-      return updated;
-    });
+  const handleDeleteProfile = async (id) => {
+    await deleteProfileFirestore(id);
+    setProfiles((p) => p.filter((x) => x.id !== id));
+    if (activeProfile?.id === id) setActiveProfile(null);
   };
-
-  const handleDeleteProfile = (id) => {
-    setProfiles((prev) => {
-      const updated = prev.filter((p) => p.id !== id);
-      deleteProfileFromFirestore(id);
-      return updated;
-    });
-    setSelectedProfileId(null);
-  };
-
-  const handleCloseDetail = () => {
-    setSelectedProfileId(null);
-  };
-
-  const handleSaveTemplates = (updatedTemplates) => {
-    setPredictionTemplates(updatedTemplates);
-    savePredictionTemplates(updatedTemplates);             // local cache
-    savePredictionTemplatesToFirestore(updatedTemplates);  // Firestore
-  };
-
-  const selectedProfile =
-    selectedProfileId && profiles.find((p) => p.id === selectedProfileId);
 
   return (
-    <div className="app-container">
-      <header>
-        <h1>JeevankWeb</h1>
-        <p>Numerology notebook for Mulyank, Bhagyank, Jeevank and combination analysis.</p>
-      </header>
+    <main className="container">
+      <Calculator
+        onProfileSaved={handleSaveProfile}
+        predictionTemplates={predictionTemplates}
+      />
 
-      <main>
-        {predictionTemplates && (
-          <Calculator
-            onProfileSaved={handleProfileSaved}
-            predictionTemplates={predictionTemplates}
-          />
+      <section style={{ marginTop: "1rem" }}>
+        {loadingProfiles ? (
+          <div className="card">Loading profiles…</div>
+        ) : (
+          <ProfilesList profiles={profiles} onSelect={setActiveProfile} onDelete={handleDeleteProfile} />
         )}
+      </section>
 
-        <ProfilesList profiles={profiles} onSelectProfile={handleSelectProfile} />
+      {activeProfile && (
+        <section style={{ marginTop: "1rem" }}>
+          <ProfileDetail profile={activeProfile} onUpdateProfile={handleUpdateProfile} />
+        </section>
+      )}
 
-        {selectedProfile && (
-          <ProfileDetail
-            profile={selectedProfile}
-            onUpdateProfile={handleUpdateProfile}
-            onDeleteProfile={handleDeleteProfile}
-            onClose={handleCloseDetail}
-          />
-        )}
+      <PredictionEditor
+        templates={predictionTemplates}
+        onSaveTemplates={setPredictionTemplates}
+      />
 
-        {predictionTemplates && (
-          <PredictionEditor
-            templates={predictionTemplates}
-            onSaveTemplates={handleSaveTemplates}
-          />
-        )}
-        <NumberDefinitions />
-        <PalmistryReport />
-
-      </main>
-    </div>
+      {/* ✅ Restored bottom sections */}
+      <NumberDefinitions />
+      <PalmistryReport />
+    </main>
   );
 }
 
